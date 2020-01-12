@@ -21,7 +21,7 @@ const StartPlaybackHandler = {
 	handle(handlerInput) {
 		return handlerInput.responseBuilder
 			.speak('Starting')
-			.addAudioPlayerPlayDirective(getPlayParams())
+			.addAudioPlayerPlayDirective(...getPlayParams())
 			.withShouldEndSession(true)
 			.getResponse()
 	},
@@ -46,7 +46,7 @@ const CustomVideoHandler = {
 
 				return handlerInput.responseBuilder
 					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(getPlayParams())
+					.addAudioPlayerPlayDirective(...getPlayParams())
 					.withShouldEndSession(true)
 					.getResponse()
 			})
@@ -80,7 +80,7 @@ const ResumeHandler = {
 	},
 	handle(handlerInput) {
 		return handlerInput.responseBuilder
-			.addAudioPlayerPlayDirective(getPlayParams())
+			.addAudioPlayerPlayDirective(...getPlayParams())
 			.withShouldEndSession(true)
 			.getResponse()
 	},
@@ -102,13 +102,12 @@ const NextHandler = {
 
 				return handlerInput.responseBuilder
 					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(getPlayParams())
+					.addAudioPlayerPlayDirective(...getPlayParams())
 					.withShouldEndSession(true)
 					.getResponse()
 			})
 			.catch(err => {
 				console.log(err)
-				reject(err)
 			})
 	},
 }
