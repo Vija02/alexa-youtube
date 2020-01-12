@@ -1,0 +1,23 @@
+{
+	"name": "alexa-youtube",
+	"description": "Youtube alexa skill backend",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "vija02",
+	"license": "MIT",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"ask-sdk": "^2.7.0",
+		"body-parser": "^1.19.0",
+		"chalk": "^3.0.0",
+		"cors": "^2.8.5",
+		"dotenv-extended": "^2.7.1",
+		"express": "^4.17.1",
+		"fluent-ffmpeg": "^2.1.2",
+		"youtube-node": "^1.3.3",
+		"ytdl-core": "^1.0.6"
+	},
+	"devDependencies": {}
+}
