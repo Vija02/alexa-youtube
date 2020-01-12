@@ -4,7 +4,7 @@ const Youtube = require('youtube-node')
 const { log, info, error } = require('../helper')
 
 const youtube = new Youtube()
-youtube.setKey('AIzaSyD5x-10Dba_UhKEkr9eWTNH1CWLNZM_9S8')
+youtube.setKey(process.env.YOUTUBE_KEY)
 const youtubeSearchPromise = promisify(youtube.search)
 
 let state = {
