@@ -1,11 +1,8 @@
-const { promisify } = require('util')
-const Youtube = require('youtube-node')
+const Youtube = require('simple-youtube-api')
 
 const { log, info, error } = require('../helper')
 
-const youtube = new Youtube()
-youtube.setKey(process.env.YOUTUBE_KEY)
-const youtubeSearchPromise = promisify(youtube.search)
+const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
 let state = {
 	playing: false,
@@ -47,12 +44,12 @@ const CustomVideoHandler = {
 		const query = handlerInput.requestEnvelope.request.intent.slots.VideoQuery
 		info(`Got query: '${query.value}'`)
 
-		return youtubeSearchPromise(query.value, 1)
+		return youtube.searchVideos(query.value, 1)
 			.then(res => {
-				state.videoId = res.items[0].id.videoId
+				state.videoId = res[0].id
 
 				return handlerInput.responseBuilder
-					.speak(`Starting ${res.items[0].snippet.title}`)
+					.speak(`Starting ${res[0].title}`)
 					.addAudioPlayerPlayDirective(
 						'REPLACE_ALL',
 						`${process.env.BACKEND_URL}/video/${state.videoId}`,
