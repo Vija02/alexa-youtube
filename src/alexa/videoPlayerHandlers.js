@@ -6,9 +6,11 @@ const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
 const state = require('../state')
 
-const getPlayParams = (method = 'REPLACE_ALL') => {
-	return [method, `${process.env.BACKEND_URL}/video/${state.videoId}`, state.videoId, 0, null]
+const getPlayParams = (method = 'REPLACE_ALL', videoId = null) => {
+	const id = videoId || state.videoId
+	return [method, `${process.env.BACKEND_URL}/video/${id}`, id, 0, null]
 }
+exports.getPlayParams = getPlayParams
 
 const StartPlaybackHandler = {
 	async canHandle(handlerInput) {
