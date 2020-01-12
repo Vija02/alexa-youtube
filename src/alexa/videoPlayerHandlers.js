@@ -4,9 +4,10 @@ const { log, info, error } = require('../helper')
 
 const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
-let state = {
-	playing: false,
-	videoId: 'xgaAyr8lAdY',
+const state = require('../state')
+
+const getPlayParams = (method = 'REPLACE_ALL') => {
+	return [method, `${process.env.BACKEND_URL}/video/${state.videoId}`, state.videoId, 0, null]
 }
 
 const StartPlaybackHandler = {
@@ -20,13 +21,7 @@ const StartPlaybackHandler = {
 	handle(handlerInput) {
 		return handlerInput.responseBuilder
 			.speak('Starting')
-			.addAudioPlayerPlayDirective(
-				'REPLACE_ALL',
-				`${process.env.BACKEND_URL}/video/${state.videoId}`,
-				Math.random(),
-				0,
-				null,
-			)
+			.addAudioPlayerPlayDirective(getPlayParams())
 			.withShouldEndSession(true)
 			.getResponse()
 	},
@@ -44,19 +39,14 @@ const CustomVideoHandler = {
 		const query = handlerInput.requestEnvelope.request.intent.slots.VideoQuery
 		info(`Got query: '${query.value}'`)
 
-		return youtube.searchVideos(query.value, 1)
+		return youtube
+			.searchVideos(query.value, 1)
 			.then(res => {
 				state.videoId = res[0].id
 
 				return handlerInput.responseBuilder
 					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(
-						'REPLACE_ALL',
-						`${process.env.BACKEND_URL}/video/${state.videoId}`,
-						Math.random(),
-						0,
-						null,
-					)
+					.addAudioPlayerPlayDirective(getPlayParams())
 					.withShouldEndSession(true)
 					.getResponse()
 			})
@@ -67,4 +57,60 @@ const CustomVideoHandler = {
 	},
 }
 
-module.exports = [StartPlaybackHandler, CustomVideoHandler]
+const PauseHandler = {
+	async canHandle(handlerInput) {
+		const request = handlerInput.requestEnvelope.request
+
+		if (request.type === 'IntentRequest') {
+			return request.intent.name === 'AMAZON.PauseIntent'
+		}
+	},
+	handle(handlerInput) {
+		return handlerInput.responseBuilder.addAudioPlayerStopDirective().getResponse()
+	},
+}
+
+const ResumeHandler = {
+	async canHandle(handlerInput) {
+		const request = handlerInput.requestEnvelope.request
+
+		if (request.type === 'IntentRequest') {
+			return request.intent.name === 'AMAZON.ResumeIntent'
+		}
+	},
+	handle(handlerInput) {
+		return handlerInput.responseBuilder
+			.addAudioPlayerPlayDirective(getPlayParams())
+			.withShouldEndSession(true)
+			.getResponse()
+	},
+}
+
+const NextHandler = {
+	async canHandle(handlerInput) {
+		const request = handlerInput.requestEnvelope.request
+
+		if (request.type === 'IntentRequest') {
+			return request.intent.name === 'AMAZON.NextIntent'
+		}
+	},
+	handle(handlerInput) {
+		return youtube
+			.searchVideos('', 1, { relatedToVideoId: state.videoId })
+			.then(res => {
+				state.videoId = res[0].id
+
+				return handlerInput.responseBuilder
+					.speak(`Starting ${res[0].title}`)
+					.addAudioPlayerPlayDirective(getPlayParams())
+					.withShouldEndSession(true)
+					.getResponse()
+			})
+			.catch(err => {
+				console.log(err)
+				reject(err)
+			})
+	},
+}
+
+module.exports = [StartPlaybackHandler, CustomVideoHandler, PauseHandler, ResumeHandler, NextHandler]

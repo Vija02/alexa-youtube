@@ -1,8 +1,10 @@
 const { log, info, error } = require('../helper')
 
+const state = require('../state')
+
 const eventList = ['PlaybackStarted', 'PlaybackFinished', 'PlaybackStopped', 'PlaybackNearlyFinished', 'PlaybackFailed']
 
-const handlers = eventList.map(eventName => {
+const standardHandlers = eventList.map(eventName => {
 	return {
 		canHandle(handlerInput) {
 			return handlerInput.requestEnvelope.request.type === `AudioPlayer.${eventName}`
@@ -14,4 +16,14 @@ const handlers = eventList.map(eventName => {
 	}
 })
 
-module.exports = handlers
+const PlaybackPausedHandler = {
+	canHandle(handlerInput) {
+		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackPaused`
+	},
+	async handle(handlerInput) {
+		console.log('paused', JSON.stringify(handlerInput))
+		return Promise.resolve(handlerInput.responseBuilder.getResponse())
+	},
+}
+
+module.exports = [...standardHandlers, PlaybackPausedHandler]
