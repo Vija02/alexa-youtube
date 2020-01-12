@@ -6,6 +6,9 @@
 	"author": "vija02",
 	"license": "MIT",
 	"scripts": {
+		"publish": "yarn build-docker && yarn deploy",
+		"build-docker": "docker build -t registry.michaelsalim.co.uk/alexa-youtube .",
+		"deploy": "docker push registry.michaelsalim.co.uk/alexa-youtube",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"dependencies": {
