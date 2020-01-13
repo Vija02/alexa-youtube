@@ -23,6 +23,7 @@ const PlaybackStartedHandler = {
 		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackStarted`
 	},
 	async handle(handlerInput) {
+		info('PlaybackStarted')
 		state.videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
@@ -40,17 +41,18 @@ const PlaybackPausedHandler = {
 	},
 }
 
-const PlaybackFinishedHandler = {
+const PlaybackNearlyFinishedHandler = {
 	canHandle(handlerInput) {
-		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackFinished`
+		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackNearlyFinished`
 	},
 	async handle(handlerInput) {
+		info('PlaybackNearlyFinished')
 		if (state.autoPlay) {
 			return youtube
 				.searchVideos('', 1, { relatedToVideoId: state.videoId })
 				.then(res => {
 					return handlerInput.responseBuilder
-						.addAudioPlayerPlayDirective(...getPlayParams('REPLACE_ALL', res[0].id))
+						.addAudioPlayerPlayDirective(...getPlayParams('ENQUEUE', res[0].id))
 						.withShouldEndSession(true)
 						.getResponse()
 				})
@@ -62,4 +64,4 @@ const PlaybackFinishedHandler = {
 	},
 }
 
-module.exports = [...standardHandlers, PlaybackStartedHandler, PlaybackPausedHandler, PlaybackFinishedHandler]
+module.exports = [...standardHandlers, PlaybackStartedHandler, PlaybackPausedHandler, PlaybackNearlyFinishedHandler]
