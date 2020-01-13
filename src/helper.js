@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 
-const state = require('../state')
+const state = require('./state')
 
 exports.log = (...params) => console.log(chalk.yellow(...params))
 exports.info = (...params) => console.info(chalk.blue(...params))
