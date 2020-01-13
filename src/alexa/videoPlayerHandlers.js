@@ -91,7 +91,7 @@ const NextHandler = {
 	},
 	handle(handlerInput) {
 		return youtube
-			.searchVideos('', 1, { relatedToVideoId: state.videoId })
+			.searchVideos('', 3, { relatedToVideoId: state.videoId })
 			.then(res => {
 				state.videoId = res[0].id
 

@@ -50,7 +50,9 @@ const PlaybackNearlyFinishedHandler = {
 		info(`PlaybackNearlyFinished. Autoplay ${state.autoPlay ? 'Enabled' : 'Disabled'}`)
 		if (state.autoPlay) {
 			return youtube
-				.searchVideos('', 1, { relatedToVideoId: state.videoId })
+				// Empty array sometimes when only querying 1
+				// Seems to be the youtube api issue so let's just get 3 to be safe
+				.searchVideos('', 3, { relatedToVideoId: state.videoId })
 				.then(res => {
 					info(`Queueing video with ID: ${res[0].id}. Was: ${state.videoId}`)
 					return handlerInput.responseBuilder
