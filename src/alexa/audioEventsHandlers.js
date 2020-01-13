@@ -1,3 +1,6 @@
+const Youtube = require('simple-youtube-api')
+const youtube = new Youtube(process.env.YOUTUBE_KEY)
+
 const { log, info, error } = require('../helper')
 
 const state = require('../state')
