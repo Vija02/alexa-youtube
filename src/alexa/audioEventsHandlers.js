@@ -23,8 +23,8 @@ const PlaybackStartedHandler = {
 		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackStarted`
 	},
 	async handle(handlerInput) {
-		// TODO: Handle setting videoid state and stuff so we keep it updated
-		console.log('Started', JSON.stringify(handlerInput))
+		state.videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
+
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
 	},
 }
@@ -40,9 +40,9 @@ const PlaybackPausedHandler = {
 	},
 }
 
-const PlaybackNearlyFinishedHandler = {
+const PlaybackFinishedHandler = {
 	canHandle(handlerInput) {
-		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackNearlyFinished`
+		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackFinished`
 	},
 	async handle(handlerInput) {
 		if (state.autoPlay) {
@@ -50,7 +50,7 @@ const PlaybackNearlyFinishedHandler = {
 				.searchVideos('', 1, { relatedToVideoId: state.videoId })
 				.then(res => {
 					return handlerInput.responseBuilder
-						.addAudioPlayerPlayDirective(...getPlayParams('ENQUEUE', res[0].id))
+						.addAudioPlayerPlayDirective(...getPlayParams('REPLACE_ALL', res[0].id))
 						.withShouldEndSession(true)
 						.getResponse()
 				})
@@ -62,4 +62,4 @@ const PlaybackNearlyFinishedHandler = {
 	},
 }
 
-module.exports = [...standardHandlers, PlaybackStartedHandler, PlaybackPausedHandler, PlaybackNearlyFinishedHandler]
+module.exports = [...standardHandlers, PlaybackStartedHandler, PlaybackPausedHandler, PlaybackFinishedHandler]
