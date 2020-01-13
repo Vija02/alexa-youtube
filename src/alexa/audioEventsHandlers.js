@@ -46,7 +46,7 @@ const PlaybackNearlyFinishedHandler = {
 		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackNearlyFinished`
 	},
 	async handle(handlerInput) {
-		info('PlaybackNearlyFinished')
+		info(`PlaybackNearlyFinished. Autoplay ${state.autoPlay ? 'Enabled' : 'Disabled'}`)
 		if (state.autoPlay) {
 			return youtube
 				.searchVideos('', 1, { relatedToVideoId: state.videoId })
