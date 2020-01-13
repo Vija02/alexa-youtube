@@ -4,7 +4,7 @@ const state = require('../state')
 
 const { getPlayParams } = require('./videoPlayerHandlers')
 
-const eventList = ['PlaybackFinished', 'PlaybackStopped', 'PlaybackNearlyFinished', 'PlaybackFailed']
+const eventList = ['PlaybackFinished', 'PlaybackStopped', 'PlaybackFailed']
 
 const standardHandlers = eventList.map(eventName => {
 	return {
