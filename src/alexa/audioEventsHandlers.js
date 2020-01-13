@@ -52,7 +52,7 @@ const PlaybackNearlyFinishedHandler = {
 				.searchVideos('', 1, { relatedToVideoId: state.videoId })
 				.then(res => {
 					return handlerInput.responseBuilder
-						.addAudioPlayerPlayDirective(...getPlayParams('ENQUEUE', res[0].id))
+						.addAudioPlayerPlayDirective(...getPlayParams('ENQUEUE', res[0].id, state.videoId))
 						.withShouldEndSession(true)
 						.getResponse()
 				})

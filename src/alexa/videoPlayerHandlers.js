@@ -6,9 +6,9 @@ const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
 const state = require('../state')
 
-const getPlayParams = (method = 'REPLACE_ALL', videoId = null) => {
+const getPlayParams = (method = 'REPLACE_ALL', videoId = null, previousToken = null) => {
 	const id = videoId || state.videoId
-	return [method, `${process.env.BACKEND_URL}/video/${id}`, id, 0, null]
+	return [method, `${process.env.BACKEND_URL}/video/${id}`, id, 0, previousToken]
 }
 exports.getPlayParams = getPlayParams
 
