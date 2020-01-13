@@ -23,7 +23,7 @@ const PlaybackStartedHandler = {
 		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackStarted`
 	},
 	async handle(handlerInput) {
-		info('PlaybackStarted')
+		info(`PlaybackStarted. Setting videoId into: ${handlerInput.requestEnvelope.context.AudioPlayer.token}`)
 		state.videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
@@ -51,6 +51,7 @@ const PlaybackNearlyFinishedHandler = {
 			return youtube
 				.searchVideos('', 1, { relatedToVideoId: state.videoId })
 				.then(res => {
+					info(`Queueing video with ID: ${res[0].id}. Was: ${state.videoId}`)
 					return handlerInput.responseBuilder
 						.addAudioPlayerPlayDirective(...getPlayParams('ENQUEUE', res[0].id, state.videoId))
 						.withShouldEndSession(true)
