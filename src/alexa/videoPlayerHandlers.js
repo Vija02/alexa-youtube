@@ -1,15 +1,9 @@
 const Youtube = require('simple-youtube-api')
 const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
-const { log, info, error } = require('../helper')
+const { log, info, error, getPlayParams } = require('../helper')
 
 const state = require('../state')
-
-const getPlayParams = (method = 'REPLACE_ALL', videoId = null, previousToken = null) => {
-	const id = videoId || state.videoId
-	return [method, `${process.env.BACKEND_URL}/video/${id}`, id, 0, previousToken]
-}
-exports.getPlayParams = getPlayParams
 
 const StartPlaybackHandler = {
 	async canHandle(handlerInput) {

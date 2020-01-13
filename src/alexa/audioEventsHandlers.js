@@ -1,11 +1,9 @@
 const Youtube = require('simple-youtube-api')
 const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
-const { log, info, error } = require('../helper')
+const { log, info, error, getPlayParams } = require('../helper')
 
 const state = require('../state')
-
-const { getPlayParams } = require('./videoPlayerHandlers')
 
 const eventList = ['PlaybackFinished', 'PlaybackStopped', 'PlaybackFailed']
 
