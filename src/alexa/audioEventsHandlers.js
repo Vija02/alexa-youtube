@@ -56,7 +56,7 @@ const PlaybackNearlyFinishedHandler = {
 				.then(res => {
 					info(`Queueing video with ID: ${res[0].id}. Was: ${state.videoId}`)
 					return handlerInput.responseBuilder
-						.addAudioPlayerPlayDirective(...getPlayParams('ENQUEUE', res[0].id, state.videoId))
+						.addAudioPlayerPlayDirective(...getPlayParams('REPLACE_ENQUEUED', res[0].id, state.videoId))
 						.withShouldEndSession(true)
 						.getResponse()
 				})
