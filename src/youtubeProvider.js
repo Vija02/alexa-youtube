@@ -29,12 +29,15 @@ module.exports = app => {
 			})
 			stream.on('end', () => {
 				info('Ended: youtubedl stream')
+				res.end()
 			})
 			ffmpegProcess.on('end', err => {
 				info('Ended: ffmpeg')
+				res.end()
 			})
 			ffmpegProcess.on('error', err => {
 				error('ffmpegProcess Error')
+				res.end()
 			})
 		} catch (err) {
 			error(err)
