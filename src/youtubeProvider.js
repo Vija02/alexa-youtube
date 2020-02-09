@@ -36,6 +36,7 @@ module.exports = app => {
 			})
 			ffmpegProcess.on('error', err => {
 				error('ffmpegProcess Error')
+				error(err)
 				res.end()
 			})
 		} catch (err) {
