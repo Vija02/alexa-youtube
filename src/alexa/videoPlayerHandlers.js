@@ -3,8 +3,6 @@ const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
 const { log, info, error, getPlayParams } = require('../helper')
 
-const state = require('../state')
-
 const StartPlaybackHandler = {
 	async canHandle(handlerInput) {
 		const request = handlerInput.requestEnvelope.request
@@ -16,7 +14,7 @@ const StartPlaybackHandler = {
 	handle(handlerInput) {
 		return handlerInput.responseBuilder
 			.speak('Starting')
-			.addAudioPlayerPlayDirective(...getPlayParams())
+			.addAudioPlayerPlayDirective(...getPlayParams(handlerInput.requestEnvelope.context.AudioPlayer.token))
 			.withShouldEndSession(true)
 			.getResponse()
 	},
@@ -30,18 +28,16 @@ const CustomVideoHandler = {
 			return request.intent.name === 'GetVideoIntent'
 		}
 	},
-	handle(handlerInput) {
+	async handle(handlerInput) {
 		const query = handlerInput.requestEnvelope.request.intent.slots.VideoQuery
 		info(`Got query: '${query.value}'`)
 
 		return youtube
 			.searchVideos(query.value, 1)
 			.then(res => {
-				state.videoId = res[0].id
-
 				return handlerInput.responseBuilder
 					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(...getPlayParams())
+					.addAudioPlayerPlayDirective(...getPlayParams(res[0].id))
 					.withShouldEndSession(true)
 					.getResponse()
 			})
@@ -75,7 +71,7 @@ const ResumeHandler = {
 	},
 	handle(handlerInput) {
 		return handlerInput.responseBuilder
-			.addAudioPlayerPlayDirective(...getPlayParams())
+			.addAudioPlayerPlayDirective(...getPlayParams(handlerInput.requestEnvelope.context.AudioPlayer.token))
 			.withShouldEndSession(true)
 			.getResponse()
 	},
@@ -89,15 +85,14 @@ const NextHandler = {
 			return request.intent.name === 'AMAZON.NextIntent'
 		}
 	},
-	handle(handlerInput) {
+	async handle(handlerInput) {
+		const lastPlayedVideoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 		return youtube
-			.searchVideos('', 3, { relatedToVideoId: state.videoId })
+			.searchVideos('', 3, { relatedToVideoId: lastPlayedVideoId })
 			.then(res => {
-				state.videoId = res[0].id
-
 				return handlerInput.responseBuilder
 					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(...getPlayParams())
+					.addAudioPlayerPlayDirective(...getPlayParams(res[0].id))
 					.withShouldEndSession(true)
 					.getResponse()
 			})

@@ -24,8 +24,8 @@ const PlaybackStartedHandler = {
 		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackStarted`
 	},
 	async handle(handlerInput) {
-		info(`PlaybackStarted. Setting videoId into: ${handlerInput.requestEnvelope.context.AudioPlayer.token}`)
-		state.videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
+		const videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
+		info(`PlaybackStarted. Setting videoId into: ${videoId}`)
 
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
 	},
@@ -47,22 +47,25 @@ const PlaybackNearlyFinishedHandler = {
 		return handlerInput.requestEnvelope.request.type === `AudioPlayer.PlaybackNearlyFinished`
 	},
 	async handle(handlerInput) {
+		const videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 		info(`PlaybackNearlyFinished. Autoplay ${state.autoPlay ? 'Enabled' : 'Disabled'}`)
 		if (state.autoPlay) {
-			return youtube
-				// Empty array sometimes when only querying 1
-				// Seems to be the youtube api issue so let's just get 3 to be safe
-				.searchVideos('', 3, { relatedToVideoId: state.videoId })
-				.then(res => {
-					info(`Queueing video with ID: ${res[0].id}. Was: ${state.videoId}`)
-					return handlerInput.responseBuilder
-						.addAudioPlayerPlayDirective(...getPlayParams('REPLACE_ENQUEUED', res[0].id))
-						.withShouldEndSession(true)
-						.getResponse()
-				})
-				.catch(err => {
-					console.log(err)
-				})
+			return (
+				youtube
+					// Empty array sometimes when only querying 1
+					// Seems to be the youtube api issue so let's just get 3 to be safe
+					.searchVideos('', 3, { relatedToVideoId: videoId })
+					.then(res => {
+						info(`Queueing video with ID: ${res[0].id}. Was: ${videoId}`)
+						return handlerInput.responseBuilder
+							.addAudioPlayerPlayDirective(...getPlayParams(res[0].id, 'REPLACE_ENQUEUED'))
+							.withShouldEndSession(true)
+							.getResponse()
+					})
+					.catch(err => {
+						console.log(err)
+					})
+			)
 		}
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
 	},
