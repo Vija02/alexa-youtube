@@ -8,8 +8,6 @@ const audioEventsHandlers = require('./audioEventsHandlers')
 
 module.exports = app => {
 	app.post('/', (req, res) => {
-		log('======== Handling Alexa ========')
-
 		const skill = Alexa.SkillBuilders.custom()
 			.addRequestHandlers(...lifecycleHandlers, ...videoPlayerHandlers, ...audioEventsHandlers)
 			.addErrorHandlers(ErrorHandler)

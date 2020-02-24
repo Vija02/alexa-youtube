@@ -25,7 +25,7 @@ const PlaybackStartedHandler = {
 	},
 	async handle(handlerInput) {
 		const videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
-		info(`PlaybackStarted. Setting videoId into: ${videoId}`)
+		info(`PlaybackStarted ${videoId}`)
 
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
 	},
@@ -56,7 +56,7 @@ const PlaybackNearlyFinishedHandler = {
 					.searchVideos('', 3, { relatedToVideoId: videoId })
 					.then(res => {
 						const videoObj = res[0]
-						info(`PlaybackNearlyFinished \`${videoId}\` ${videoObj.id} \`${videoObj.title}\``)
+						info(`PlaybackNearlyFinished ${videoId} ${videoObj.id} \`${videoObj.title}\``)
 						return handlerInput.responseBuilder
 							.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id, 'REPLACE_ENQUEUED'))
 							.withShouldEndSession(true)
