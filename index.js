@@ -8,7 +8,6 @@ if (!process.env.GENEROUS_CORS.match(/^(true|false)$/i)) {
 }
 
 const server = require('./src/server')
-require('./src/youtubeProvider')(server)
 require('./src/alexa')(server)
 
 const port = process.env.PORT || 3000
