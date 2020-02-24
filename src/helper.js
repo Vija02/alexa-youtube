@@ -18,7 +18,7 @@ exports.chooseVideo = (youtubeRes, historyObj) => {
 	for (let i = 0; i < youtubeRes.length; i++) {
 		// Might have error accessing the ID if it's not a video object(?), let's just ignore it for now
 		try {
-			if (historyObj.includes(youtubeRes[i].id)) {
+			if (!historyObj.includes(youtubeRes[i].id)) {
 				return youtubeRes[i]
 			}
 		} catch (e) {}
