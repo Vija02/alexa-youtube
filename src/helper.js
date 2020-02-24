@@ -19,10 +19,10 @@ exports.chooseVideo = (youtubeRes, historyObj) => {
 		// Might have error accessing the ID if it's not a video object(?), let's just ignore it for now
 		try {
 			if (historyObj.includes(youtubeRes[i].id)) {
-				return youtubeRes[i].id
+				return youtubeRes[i]
 			}
 		} catch (e) {}
 	}
 	// Unlikely, but if all is selected... let's choose the last one :)
-	return youtubeRes[youtubeRes.length - 1].id
+	return youtubeRes[youtubeRes.length - 1]
 }
