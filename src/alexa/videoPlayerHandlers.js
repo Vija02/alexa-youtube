@@ -94,7 +94,7 @@ const NextHandler = {
 			.searchVideos('', videoHistoryLength + 1, { relatedToVideoId: lastPlayedVideoId })
 			.then(res => {
 				const videoObj = chooseVideo(res, state.history)
-				info(`NextIntent \`${lastPlayedVideoId}\` ${videoObj.id} \`${videoObj.title}\``)
+				info(`NextIntent ${lastPlayedVideoId} ${videoObj.id} \`${videoObj.title}\``)
 				return handlerInput.responseBuilder
 					.speak(`Starting ${videoObj.title}`)
 					.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id))
