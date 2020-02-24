@@ -30,14 +30,16 @@ const CustomVideoHandler = {
 	},
 	async handle(handlerInput) {
 		const query = handlerInput.requestEnvelope.request.intent.slots.VideoQuery
-		info(`Got query: '${query.value}'`)
 
 		return youtube
-			.searchVideos(query.value, 1)
+			.searchVideos(query.value, 3)
 			.then(res => {
+				// TODO: Make sure this is only videos
+				const videoObj = res[0]
+				info(`GetVideoIntent \`${query.value}\` ${videoObj.id} \`${videoObj.title}\``)
 				return handlerInput.responseBuilder
-					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(...getPlayParams(res[0].id))
+					.speak(`Starting ${videoObj.title}`)
+					.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id))
 					.withShouldEndSession(true)
 					.getResponse()
 			})
@@ -90,9 +92,12 @@ const NextHandler = {
 		return youtube
 			.searchVideos('', 3, { relatedToVideoId: lastPlayedVideoId })
 			.then(res => {
+				// TODO: Make sure this is only videos
+				const videoObj = res[0]
+				info(`NextIntent \`${lastPlayedVideoId}\` ${videoObj.id} \`${videoObj.title}\``)
 				return handlerInput.responseBuilder
-					.speak(`Starting ${res[0].title}`)
-					.addAudioPlayerPlayDirective(...getPlayParams(res[0].id))
+					.speak(`Starting ${videoObj.title}`)
+					.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id))
 					.withShouldEndSession(true)
 					.getResponse()
 			})

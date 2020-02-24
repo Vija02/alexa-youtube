@@ -48,7 +48,6 @@ const PlaybackNearlyFinishedHandler = {
 	},
 	async handle(handlerInput) {
 		const videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
-		info(`PlaybackNearlyFinished. Autoplay ${state.autoPlay ? 'Enabled' : 'Disabled'}`)
 		if (state.autoPlay) {
 			return (
 				youtube
@@ -56,9 +55,10 @@ const PlaybackNearlyFinishedHandler = {
 					// Seems to be the youtube api issue so let's just get 3 to be safe
 					.searchVideos('', 3, { relatedToVideoId: videoId })
 					.then(res => {
-						info(`Queueing video with ID: ${res[0].id}. Was: ${videoId}`)
+						const videoObj = res[0]
+						info(`PlaybackNearlyFinished \`${videoId}\` ${videoObj.id} \`${videoObj.title}\``)
 						return handlerInput.responseBuilder
-							.addAudioPlayerPlayDirective(...getPlayParams(res[0].id, 'REPLACE_ENQUEUED'))
+							.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id, 'REPLACE_ENQUEUED'))
 							.withShouldEndSession(true)
 							.getResponse()
 					})
