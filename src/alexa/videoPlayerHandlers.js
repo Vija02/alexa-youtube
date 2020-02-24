@@ -1,7 +1,9 @@
 const Youtube = require('simple-youtube-api')
 const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
-const { log, info, error, getPlayParams } = require('../helper')
+const { log, info, error, getPlayParams, videoHistoryLength, chooseVideo } = require('../helper')
+
+const state = require('../state')
 
 const StartPlaybackHandler = {
 	async canHandle(handlerInput) {
@@ -32,10 +34,9 @@ const CustomVideoHandler = {
 		const query = handlerInput.requestEnvelope.request.intent.slots.VideoQuery
 
 		return youtube
-			.searchVideos(query.value, 3)
+			.searchVideos(query.value, videoHistoryLength + 1)
 			.then(res => {
-				// TODO: Make sure this is only videos
-				const videoObj = res[0]
+				const videoObj = chooseVideo(res, state.history)
 				info(`GetVideoIntent \`${query.value}\` ${videoObj.id} \`${videoObj.title}\``)
 				return handlerInput.responseBuilder
 					.speak(`Starting ${videoObj.title}`)
@@ -90,10 +91,9 @@ const NextHandler = {
 	async handle(handlerInput) {
 		const lastPlayedVideoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 		return youtube
-			.searchVideos('', 3, { relatedToVideoId: lastPlayedVideoId })
+			.searchVideos('', videoHistoryLength + 1, { relatedToVideoId: lastPlayedVideoId })
 			.then(res => {
-				// TODO: Make sure this is only videos
-				const videoObj = res[0]
+				const videoObj = chooseVideo(res, state.history)
 				info(`NextIntent \`${lastPlayedVideoId}\` ${videoObj.id} \`${videoObj.title}\``)
 				return handlerInput.responseBuilder
 					.speak(`Starting ${videoObj.title}`)

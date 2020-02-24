@@ -1,7 +1,7 @@
 const Youtube = require('simple-youtube-api')
 const youtube = new Youtube(process.env.YOUTUBE_KEY)
 
-const { log, info, error, getPlayParams } = require('../helper')
+const { log, info, error, getPlayParams, videoHistoryLength, chooseVideo} = require('../helper')
 
 const state = require('../state')
 
@@ -26,6 +26,7 @@ const PlaybackStartedHandler = {
 	async handle(handlerInput) {
 		const videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 		info(`PlaybackStarted ${videoId}`)
+		state.history = [videoId, ...state.history.slice(0, videoHistoryLength - 1)]
 
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
 	},
@@ -49,23 +50,19 @@ const PlaybackNearlyFinishedHandler = {
 	async handle(handlerInput) {
 		const videoId = handlerInput.requestEnvelope.context.AudioPlayer.token
 		if (state.autoPlay) {
-			return (
-				youtube
-					// Empty array sometimes when only querying 1
-					// Seems to be the youtube api issue so let's just get 3 to be safe
-					.searchVideos('', 3, { relatedToVideoId: videoId })
-					.then(res => {
-						const videoObj = res[0]
-						info(`PlaybackNearlyFinished ${videoId} ${videoObj.id} \`${videoObj.title}\``)
-						return handlerInput.responseBuilder
-							.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id, 'REPLACE_ENQUEUED'))
-							.withShouldEndSession(true)
-							.getResponse()
-					})
-					.catch(err => {
-						console.log(err)
-					})
-			)
+			return youtube
+				.searchVideos('', videoHistoryLength + 1, { relatedToVideoId: videoId })
+				.then(res => {
+					const videoObj = chooseVideo(res, state.history)
+					info(`PlaybackNearlyFinished ${videoId} ${videoObj.id} \`${videoObj.title}\``)
+					return handlerInput.responseBuilder
+						.addAudioPlayerPlayDirective(...getPlayParams(videoObj.id, 'REPLACE_ENQUEUED'))
+						.withShouldEndSession(true)
+						.getResponse()
+				})
+				.catch(err => {
+					console.log(err)
+				})
 		}
 		return Promise.resolve(handlerInput.responseBuilder.getResponse())
 	},
